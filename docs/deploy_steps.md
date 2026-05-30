@@ -69,7 +69,10 @@ The repository follows a Terragrunt-based multi-environment structure:
 
 ### Key Components
 
-- **`root.hcl`**: Defines the remote state backend (Azure Blob Storage) and common provider settings. It uses `path_relative_to_include()` to dynamically set the state key.
+- **`root.hcl`**: Defines the remote state backend dynamically:
+    - **Azure**: Uses Azure Blob Storage (`azurerm`).
+    - **AWS**: Uses Amazon S3 (`s3`) with native **lockfile** support (available in Terraform 1.10.0+).
+  It uses `path_relative_to_include()` to dynamically set the state key for both clouds. See [FinOps Setup Guide](./finops_setup.md) for billing details.
 - **`modules/`**: Contains pure Terraform code for various resources. These are intended to be generic and reusable.
 - **`live/`**: Contains `terragrunt.hcl` files for each resource in each environment. These files reference the modules and provide environment-specific inputs.
 
@@ -111,6 +114,14 @@ cd live/azure/dev/networking
 To see what changes will be made:
 ```bash
 terragrunt plan
+```
+
+**Proactive Cost Estimation (Optional):**
+To see the cost impact of your changes before applying, use [Infracost](./infracost_setup.md):
+```bash
+terragrunt plan -out tfplan.binary
+terragrunt show -json tfplan.binary > tfplan.json
+infracost breakdown --path tfplan.json
 ```
 
 #### 3. Apply Changes
