@@ -7,7 +7,7 @@ locals {
 
   aws_provider = <<EOF
 provider "aws" {
-  region = "us-east-1"
+  region = "us-west-1"
 }
 EOF
 
@@ -27,9 +27,9 @@ remote_state {
   }
 
   config = local.cloud == "aws" ? {
-    bucket       = "terraform-state-aws-dev-05072026"
+    bucket       = "isre-devops-terraform-state-139337686739"
     key          = "${path_relative_to_include()}/terraform.tfstate"
-    region       = "us-east-1"
+    region       = "us-west-1"
     encrypt      = true
     use_lockfile = true
   } : {

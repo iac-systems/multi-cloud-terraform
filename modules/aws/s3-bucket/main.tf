@@ -18,3 +18,27 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "state" {
     }
   }
 }
+
+resource "aws_s3_bucket_policy" "mfa_delete_policy" {
+  bucket = aws_s3_bucket.state.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "EnforceMFADelete"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = [
+          "s3:DeleteObject",
+          "s3:DeleteObjectVersion"
+        ]
+        Resource = "${aws_s3_bucket.state.arn}/*"
+        Condition = {
+          Bool = {
+            "aws:MultiFactorAuthPresent" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
